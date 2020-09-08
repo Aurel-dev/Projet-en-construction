@@ -2,7 +2,9 @@
 
     $firstname = $name = $email = $phone = $message = "";
     $firstnameError = $nameError = $emailError = $phoneError = $messageError = "";
-    
+    $isSuccess = false; //pour le message de confirmation d'envoi
+    $emailTo = "dhellemme.a@gmail.com";
+
     if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
         $firstname = verifyInput($_POST["firstname"]);
@@ -10,30 +12,64 @@
         $email = verifyInput($_POST["email"]);
         $phone = verifyInput($_POST["phone"]);
         $message = verifyInput($_POST["message"]);
+        $isSuccess = true;
+        $emailText = "";
 
         if(empty($firstname))
         {
             $firstnameError = "Je souhaite connaître ton prénom !";
+            $isSuccess = false;
+        }
+        else 
+        {
+            $emailText .= "Firstname: $firstname\n";
         }
             
         if(empty($name))
         {
             $nameError = "Je souhaite connaître ton nom !";
+            $isSuccess = false;
         }
-
-        if(empty($message))
+        else 
         {
-            $messageError = "Dis-moi tout !";
+            $emailText .= "Name: $name\n";
         }
-
+            
         if(!isEmail($email)) //en rapport avec la fonction isEmail
         {
             $emailError = " Adresse-mail invalide ";
+            $isSuccess = false;
+        }
+        else
+        {
+            $emailText .= "Email: $email\n";
         }
 
         if(!isPhone($phone)) //en rapport avec la fonction isPhone
         {
             $phoneError = " Que des chiffres et des espaces stp ...";
+            $isSuccess = false;
+        }
+        else
+        {
+            $emailText .= "Phone: $phone\n";
+        }
+
+        if(empty($message))
+        {
+            $messageError = "Dis-moi tout !";
+            $isSuccess = false;
+        }
+        else 
+        {
+            $emailText .= "Message: $message\n";
+        }
+            
+        if($isSuccess) //envoi de l'email
+        {
+            $headers = "From: $firstname $name <$email>\r\nReply-To: $email";
+            mail($emailTo, "Quelqu'un veut vous contacter !", $emailText, $headers);
+            $firstname = $name = $email = $phone = $message = ""; //remettre à zéro les champs
         }
 
     }
@@ -115,7 +151,7 @@
                             </div>
                         </div>
 
-                        <p class="thank-you">Votre message a bien été envoyé. Merci de m'avoir contacté :)</p>
+                        <p class="thank-you" style="display:<?php if($isSuccess) echo 'block'; else echo 'none';?>">Votre message a bien été envoyé. Merci de m'avoir contacté :)</p>
                 </form> 
                 </div>
             </div>
