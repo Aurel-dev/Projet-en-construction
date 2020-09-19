@@ -1,3 +1,3 @@
 # formulaire-de-contact
-Simple contact form
+Simple contact form.
 Use of PHP & AJAX
